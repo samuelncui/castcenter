@@ -48,12 +48,12 @@ func (w *RedisWrap) Expire(key string, expiration time.Duration) (bool, error) {
 
 // ZAdd implement castcenter.Redis
 func (w *RedisWrap) ZAdd(key, member string, score float64) (int64, error) {
-	return w.Client.ZAdd(key, redis.Z{Member: member, Score: score}).Result()
+	return w.Client.ZAdd(key, &redis.Z{Member: member, Score: score}).Result()
 }
 
 // ZRangeByScore implement castcenter.Redis
 func (w *RedisWrap) ZRangeByScore(key string, min, max float64) ([]string, error) {
-	return w.Client.ZRangeByScore(key, redis.ZRangeBy{
+	return w.Client.ZRangeByScore(key, &redis.ZRangeBy{
 		Min: strconv.FormatFloat(min, 'f', -1, 64),
 		Max: strconv.FormatFloat(max, 'f', -1, 64),
 	}).Result()
