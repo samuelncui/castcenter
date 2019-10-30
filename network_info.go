@@ -25,7 +25,7 @@ func init() {
 type NetworkInfo struct {
 	HardwareName string
 	IP           string
-	SubNet       string
+	SubNet       *net.IPNet
 }
 
 func getNetworkInfo() (*NetworkInfo, error) {
@@ -61,7 +61,7 @@ func getNetworkInfo() (*NetworkInfo, error) {
 						return nil, err
 					}
 
-					info.SubNet = net.String()
+					info.SubNet = net
 					return &info, nil
 				}
 			}

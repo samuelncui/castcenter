@@ -30,7 +30,7 @@ func GetBytes() []byte {
 
 // PutBytes .
 func PutBytes(buf []byte) {
-	pool.Put(buf)
+	pool.Put(buf[:cap(buf)])
 }
 
 func recoverLoop(f func()) {

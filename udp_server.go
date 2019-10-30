@@ -50,9 +50,6 @@ func (s *UDPServer) receiveDatagrams() {
 		buf := GetBytes()
 		n, addr, err := s.connection.ReadFromUDP(buf)
 		if err == nil {
-			// Ignore trailing control characters and NULs
-			for ; (n > 0) && (buf[n-1] < 32); n-- {
-			}
 			if n > 0 {
 				s.ch <- &UDPEvent{
 					ip:  addr.IP.String(),

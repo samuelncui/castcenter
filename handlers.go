@@ -55,7 +55,7 @@ func (c *CastCenter) handleReceive(event *UDPEvent) {
 	hashed := md5.Sum(event.buf)
 	c.cache.Set(string(hashed[:]), 1, time.Second)
 
-	logrus.Debugf("receive: %s", hex.Dump(event.buf))
+	logrus.Debugf("receive: len= %d content= %s", len(event.buf), hex.Dump(event.buf))
 	c.multicastConn.Write(event.buf)
 }
 
@@ -87,7 +87,7 @@ func (c *CastCenter) handleSend(event *UDPEvent) {
 
 	hexstr := hex.Dump(event.buf)
 	for host, conn := range c.GetClusterStatus().Conns {
-		logrus.Debugf("send to %s: %s", host, hexstr)
+		logrus.Debugf("send to %s: len= %d content= %s", host, len(event.buf), hexstr)
 		conn.Write(event.buf)
 	}
 }

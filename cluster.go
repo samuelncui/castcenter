@@ -26,6 +26,7 @@ func (c *CastCenter) GetClusterStatus() *ClusterStatus {
 
 // SetClusterStatus .
 func (c *CastCenter) SetClusterStatus(cs *ClusterStatus) {
+	logrus.Infof("castcenter fresh cluster status: %+v", cs)
 	c.clusterStatus.Store(cs)
 }
 
@@ -67,7 +68,13 @@ func (c *CastCenter) heartbeat() error {
 
 	conns := make(map[string]*net.UDPConn, len(hosts))
 	for _, host := range hosts {
-		if host == c.serviceAddr {
+		addr, err := net.ResolveUDPAddr("udp", host)
+		if err != nil {
+			logrus.WithError(err).Errorf("castcenter: append conn fail when resolve udp addr, host= %s", host)
+			return err
+		}
+
+		if netinfo.SubNet.Contains(addr.IP) {
 			continue
 		}
 
@@ -75,12 +82,6 @@ func (c *CastCenter) heartbeat() error {
 		if ok {
 			conns[host] = conn
 			continue
-		}
-
-		addr, err := net.ResolveUDPAddr("udp", host)
-		if err != nil {
-			logrus.WithError(err).Errorf("castcenter: append conn fail when resolve udp addr, host= %s", host)
-			return err
 		}
 
 		conn, err = net.DialUDP("udp", nil, addr)
@@ -113,7 +114,8 @@ func (c *CastCenter) checkSubNetLeader() (bool, error) {
 		return true, nil
 	}
 
-	if !c.GetClusterStatus().SubNetLeader {
+	oldStatus := c.GetClusterStatus()
+	if oldStatus != nil && !oldStatus.SubNetLeader {
 		return false, nil
 	}
 
